@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     @Transactional
     @Modifying(clearAutomatically = true)
@@ -15,4 +17,7 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
 
     @Query(value = "SELECT p from Pedido p LEFT JOIN FETCH p.itens where p.id = :id")
     Pedido porIdComItens(Long id);
+
+    @Query("SELECT DISTINCT p FROM Pedido p LEFT JOIN FETCH p.itens")
+    List<Pedido> findAllComItens();
 }

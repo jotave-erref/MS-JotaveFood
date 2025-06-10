@@ -1,7 +1,9 @@
 package com.jotavefood.pedido.pedidos.service;
 
+import com.jotavefood.pedido.pedidos.dto.ItemPedidoDto;
 import com.jotavefood.pedido.pedidos.dto.PedidoDto;
 import com.jotavefood.pedido.pedidos.dto.StatusDto;
+import com.jotavefood.pedido.pedidos.model.ItemPedido;
 import com.jotavefood.pedido.pedidos.model.Pedido;
 import com.jotavefood.pedido.pedidos.model.Status;
 import com.jotavefood.pedido.pedidos.repository.PedidoRepository;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +25,7 @@ public class PedidoService {
 
 
     public List<PedidoDto> obterTodos() {
-        return repository.findAll().stream()
+        return repository.findAllComItens().stream()
                 .map(PedidoDto::fromEntity).toList();
     }
 
@@ -36,16 +39,18 @@ public class PedidoService {
         Pedido pedido = new Pedido();
         pedido.setDataHora(LocalDateTime.now());
         pedido.setStatus(Status.REALIZADO);
-        pedido.getItens().forEach(item -> item.setPedido(pedido));
+
+        List<ItemPedido> itens = dto.itens().stream().map(itemDto -> {
+            ItemPedido item = new ItemPedido();
+            item.setQuantidade(itemDto.quantidade());
+            item.setDescricao(itemDto.descricao());
+            item.setPedido(pedido);
+            return item;
+                }).toList();
+        pedido.setItens(itens);
 
         Pedido salvo = repository.save(pedido);
-
-        return new PedidoDto(
-                salvo.getId(),
-                salvo.getDataHora(),
-                salvo.getStatus(),
-                salvo.getItens()
-        );
+        return PedidoDto.fromEntity(salvo);
 
     }
 
@@ -59,7 +64,8 @@ public class PedidoService {
 
         pedido.setStatus(dto.status());
         repository.atualizaStatus(dto.status(), pedido);
-        return new PedidoDto(pedido.getId(), pedido.getDataHora(), pedido.getStatus(), pedido.getItens());
+        return new PedidoDto(pedido.getId(), pedido.getDataHora(), pedido.getStatus(),
+                pedido.getItens().stream().map(ItemPedidoDto::fromEntity).collect(Collectors.toList()));
     }
 
     public void aprovaPagamentoPedido(Long id) {
