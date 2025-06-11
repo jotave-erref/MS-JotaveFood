@@ -48,6 +48,11 @@ public class PagamentoController {
         return ResponseEntity.ok(atualizado);
     }
 
+    @PatchMapping("/{id}/confirmar")
+    public void confrimarPagamento(@PathVariable @NotNull Long id){
+        service.confirmaPagamento(id);
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<PagamentoDto> excluir(@PathVariable Long id){
         service.excluirPagamento(id);

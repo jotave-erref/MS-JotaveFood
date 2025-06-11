@@ -1,6 +1,7 @@
 package br.com.jotavefood.pagamentos.service;
 
 import br.com.jotavefood.pagamentos.dto.PagamentoDto;
+import br.com.jotavefood.pagamentos.http.PedidoClients;
 import br.com.jotavefood.pagamentos.model.Pagamento;
 import br.com.jotavefood.pagamentos.model.Status;
 import br.com.jotavefood.pagamentos.repository.PagamentoRepository;
@@ -11,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.modelmapper.ModelMapper;
+
+
+import java.util.Optional;
 
 
 @Service
@@ -19,6 +22,9 @@ import org.modelmapper.ModelMapper;
 public class PagamentoService {
     @Autowired
     private PagamentoRepository repository;
+
+    @Autowired
+    private PedidoClients pedido;
 
 
     public Page<PagamentoDto> obterTodos(Pageable paginacao){
@@ -76,6 +82,18 @@ public class PagamentoService {
         pagamento = repository.save(pagamento);
 
         return PagamentoDto.fromEntity(pagamento);
+    }
+
+    public void confirmaPagamento(Long id){
+        Optional<Pagamento> pagamento = repository.findById(id);
+
+        if(!pagamento.isPresent()){
+            throw new EntityNotFoundException();
+        }
+
+        pagamento.get().setStatus(Status.APROVADO);
+        repository.save(pagamento.get());
+        pedido.atualizaPagamento(pagamento.get().getPedidoId());
     }
 
     public void excluirPagamento(Long id){
