@@ -2,6 +2,7 @@ package br.com.jotavefood.pagamentos.controller;
 
 import br.com.jotavefood.pagamentos.dto.PagamentoDto;
 import br.com.jotavefood.pagamentos.service.PagamentoService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,9 +50,16 @@ public class PagamentoController {
     }
 
     @PatchMapping("/{id}/confirmar")
+    @CircuitBreaker(name = "atualizaPedido", fallbackMethod = "pagamentoAutorizadoComIntegracaopendente")
     public void confrimarPagamento(@PathVariable @NotNull Long id){
         service.confirmaPagamento(id);
     }
+
+    public void pagamentoAutorizadoComIntegracaopendente(Long id, Exception e){
+        service.alteraStatus(id);
+
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<PagamentoDto> excluir(@PathVariable Long id){

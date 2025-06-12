@@ -4,5 +4,6 @@ public enum Status {
 
     CRIADO,
     APROVADO,
+    APROVADO_SEM_INTEGRACAO,
     CANCELADO
 }
