@@ -32,6 +32,7 @@ public record PagamentoDto(
                 pagamento.getStatus(),
                 pagamento.getPedidoId(),
                 pagamento.getFormaDePagamentoId()
+
         );
     }
 }

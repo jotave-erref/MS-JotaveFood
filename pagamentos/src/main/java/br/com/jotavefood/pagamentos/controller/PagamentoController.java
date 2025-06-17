@@ -1,5 +1,6 @@
 package br.com.jotavefood.pagamentos.controller;
 
+import br.com.jotavefood.pagamentos.dto.PagamentoComItensDto;
 import br.com.jotavefood.pagamentos.dto.PagamentoDto;
 import br.com.jotavefood.pagamentos.service.PagamentoService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -28,8 +29,8 @@ public class PagamentoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PagamentoDto> detalhar(@PathVariable @NotNull Long id){
-        PagamentoDto dto = service.obterPorId(id);
+    public ResponseEntity<PagamentoComItensDto> detalhar(@PathVariable @NotNull Long id){
+        PagamentoComItensDto dto = service.detalharPagamentoComItens(id);
 
         return ResponseEntity.ok(dto);
     }

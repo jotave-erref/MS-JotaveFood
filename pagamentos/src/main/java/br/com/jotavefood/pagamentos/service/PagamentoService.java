@@ -1,5 +1,7 @@
 package br.com.jotavefood.pagamentos.service;
 
+import br.com.jotavefood.pagamentos.dto.ItemPedidoDto;
+import br.com.jotavefood.pagamentos.dto.PagamentoComItensDto;
 import br.com.jotavefood.pagamentos.dto.PagamentoDto;
 import br.com.jotavefood.pagamentos.http.PedidoClients;
 import br.com.jotavefood.pagamentos.model.Pagamento;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -32,9 +35,22 @@ public class PagamentoService {
                 .map(PagamentoDto::fromEntity);
     }
 
-    public PagamentoDto obterPorId(Long id){
-        return repository.findById(id).map(PagamentoDto::fromEntity)
-                .orElseThrow(() -> new EntityNotFoundException());
+    public PagamentoComItensDto detalharPagamentoComItens(Long id){
+        Pagamento pagamento = repository.findById(id).orElseThrow(() -> new EntityNotFoundException("Pagamento não encontrado"));
+
+        List<ItemPedidoDto> itens = pedido.buscarItensDoPedido(pagamento.getId());
+        return new PagamentoComItensDto(
+                pagamento.getId(),
+                pagamento.getValor(),
+                pagamento.getNome(),
+                pagamento.getNumero(),
+                pagamento.getExpiracao(),
+                pagamento.getCodigo(),
+                pagamento.getStatus(),
+                pagamento.getFormaDePagamentoId(),
+                pagamento.getPedidoId(),
+                itens);
+
     }
 
     public PagamentoDto criarPagamento(PagamentoDto dto) {

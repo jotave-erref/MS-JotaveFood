@@ -27,7 +27,7 @@ public class PedidoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PedidoDto> listarPorId(@PathVariable @NotNull Long id) {
+    public ResponseEntity<PedidoDto> buscarPorId(@PathVariable @NotNull Long id) {
         PedidoDto dto = service.obterPorId(id);
 
         return  ResponseEntity.ok(dto);
