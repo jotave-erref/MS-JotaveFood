@@ -61,23 +61,6 @@ Cada serviço possui sua própria base de código, base de dados e ciclo de vida
 
 ---
 
-## 🌐 Gateway de Entrada
-
-Utilizando o **Spring Cloud Gateway**, todas as requisições externas são roteadas para o microsserviço apropriado com base no caminho.
-
-```yaml
-spring:
-  cloud:
-    gateway:
-      routes:
-        - id: pagamentos
-          uri: lb://pagamentos
-          predicates:
-            - Path=/pagamentos/**
-```
-
----
-
 ## 🗄️ Banco de Dados
 
 - Cada serviço tem sua **própria base de dados** (isolamento de dados)
@@ -100,22 +83,26 @@ spring:
    git clone https://github.com/seu-usuario/jotavefood.git
    ```
 
-2. Crie dois bancos de dados:
-   - `pagamentos`
-   - `pedidos`
+2. Crie os bancos de dados:
+   - `jotavefood-pagamento`
+   - `jotavefood-pedido com a tabela item_do_pedido (armazena os detalhes de cada pedido)`
 
-3. Configure os arquivos `application.yml` de cada serviço com suas credenciais MySQL
+3. Configure os arquivos `application.properties` de cada serviço com suas credenciais MySQL (usuário, senha, url, etc).
 
 4. Execute os serviços na seguinte ordem:
 
    ```
-   1. server      (porta 8761)
-   2. gateway     (porta 8080)
-   3. pedidos     (porta 8081)
-   4. pagamentos  (porta 8082)
+   1. server      (porta fixa: 8081)
+   2. gateway     (porta fixa: 8082)
+   3. pedidos     (porta dinâmica: atribuída automaticamente)
+   4. pagamentos  (porta dinâmica: atribuída automaticamente)
    ```
 
-5. Acesse o Eureka Dashboard: [http://localhost:8761](http://localhost:8761)
+   > ⚠️ Importante: Os serviços pedidos e pagamentos registram-se automaticamente no Eureka com uma porta aleatória. Certifique-se de que o servidor Eureka (server) esteja ativo antes de iniciar esses serviços, para que possam se registrar corretamente.
+
+   ---  
+
+5. Acesse o Eureka Dashboard: http://localhost:8081
 
 ---
 
